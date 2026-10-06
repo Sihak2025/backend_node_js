@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
 config();
-connectDB();
+await connectDB();
 
 const app = express();
 app.use(cookieParser());
