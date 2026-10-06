@@ -5,12 +5,15 @@ import { config } from 'dotenv';
 import { connectDB, disconnectDB } from './config/db.js';
 import { router } from './routes/apiRoutes.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 config();
 connectDB();
 
 const app = express();
 app.use(cookieParser());
+
+app.use(cors());
 
 // Body parsing middleware
 app.use(express.json());
