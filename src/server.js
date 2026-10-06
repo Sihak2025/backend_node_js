@@ -22,6 +22,18 @@ app.use(express.urlencoded({ extended: true }));
 // API Route in server
 app.use('/api', router);
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend service is running.',
+    apiBase: '/api',
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running.. ${PORT}`);

@@ -149,7 +149,7 @@ router.get(
   getAllStockProduct,
 );
 router.get(
-  'stock_products/:id',
+  '/stock_products/:id',
   authMiddleware,
   checkRole(['admin']),
   getStockProductById,
@@ -225,7 +225,7 @@ router.put(
 router.delete(
   '/order_items/:id',
   authMiddleware,
-  checkRole(['çustomer']),
+  checkRole(['customer']),
   deleteOrderItem,
 );
 
