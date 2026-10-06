@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  role     Role    @default(customer)
+  order    Order[]
+}
+
+enum Role {
+  admin
+  customer
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  product     Product[]
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  categoryId    String
+  name          String
+  price         Decimal         @db.Decimal(10, 2)
+  description   String?
+  image         String?
+  stock_product Stock_Product[]
+  order_item    Order_Item[]
+
+  //relationship
+  category        Category          @relation(fields: [categoryId], references: [id])
+  productVariants product_variant[]
+}
+
+model product_variant {
+  id            String          @id @default(uuid())
+  productId     String
+  size          String
+  stock_product Stock_Product[]
+  //relationship
+  product       Product         @relation(fields: [productId], references: [id])
+}
+
+model Stock_Product {
+  id               String          @id @default(uuid())
+  productId        String
+  productVariantId String?         @map("product_variantId")
+  stock_in         Int
+  stock_out        Int
+  balance          Int
+  createdAt        DateTime        @default(now())
+
+  product        Product          @relation(fields: [productId], references: [id])
+  productVariant product_variant? @relation(fields: [productVariantId], references: [id])
+}
+
+model Order {
+  id         String       @id @default(uuid())
+  userId     String
+  totalAmout Decimal      @db.Decimal(10, 2)
+  status     Status       @default(process)
+  createdAt  DateTime     @default(now())
+  order_item Order_Item[]
+  payment    Payment[]
+
+  //relationship
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum Status {
+  process
+  delivered
+  cancle
+}
+
+model Order_Item {
+  id        String  @id @default(uuid())
+  productId String
+  orderId   String
+  quantity  Int
+  price     Decimal @db.Decimal(5, 2)
+
+  //relationship
+  product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
+}
+
+model PaymentMethod {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  image       String?
+  payment     Payment[]
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  paymentMethodId String
+  orderId         String
+  amount          Decimal       @db.Decimal(10, 2)
+  status          StatusPayment @default(process)
+  //relationship
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  order           Order         @relation(fields: [orderId], references: [id])
+}
+
+enum StatusPayment {
+  process
+  fail
+  success
+}
